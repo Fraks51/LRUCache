@@ -1,10 +1,11 @@
 import unittest
 from lru_cache import LRUCache
+import random
+
 
 little_dict = {"a": 1, "b": 2, "c": 3,
                "d": 4, "e": 5}
 big_dict = {i: i for i in range(1000)}
-
 
 class TestLRUCache(unittest.TestCase):
 
@@ -33,6 +34,25 @@ class TestLRUCache(unittest.TestCase):
         self.assertEqual(big_lru_cache.get(1), 1)
         self.assertIsNone(big_lru_cache.get(2))
         self.assertEqual(big_lru_cache.get(1001), 1001)
+        for i in range(100):
+            big_lru_cache.add(1003 + i, 1003 + i)
+        self.assertEqual(big_lru_cache.get(1), 1)
+
+        for i in range(100):
+            self.assertIsNone(big_lru_cache.get(3 + i))
+            self.assertEqual(big_lru_cache.get(1003 + i), 1003 + i)
+
+    def test_as_dict_random(self):
+        lru_cache = LRUCache(max_size=1000)
+        default_dict = {}
+        for _ in range(1000):
+            key = random.randint(-100000, 1000000)
+            value = random.randint(-100000, 1000000)
+            default_dict[key] = value
+            lru_cache.add(key, value)
+
+        for key, value in default_dict.items():
+            self.assertEqual(lru_cache.get(key), default_dict[key])
 
 
 if __name__ == '__main__':
